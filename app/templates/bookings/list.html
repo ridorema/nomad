@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block page_title %}Bookings{% endblock %}
+{% block page_subtitle %}Search + filters{% endblock %}
+
+{% block content %}
+
+<div class="card card-soft p-3 mb-3">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-12 col-lg-3">
+      <label class="form-label">Search (ref / name / email / phone)</label>
+      {{ form.q(class="form-control", placeholder="OUT-2026-000001 or John...") }}
+    </div>
+
+    <div class="col-12 col-lg-2">
+      <label class="form-label">Destination</label>
+      {{ form.destination(class="form-control", placeholder="Rome") }}
+    </div>
+
+    <div class="col-12 col-lg-2">
+      <label class="form-label">Status</label>
+      {{ form.status(class="form-select") }}
+    </div>
+
+    <div class="col-6 col-lg-2">
+      <label class="form-label">Travel date from</label>
+      {{ form.date_from(class="form-control") }}
+    </div>
+
+    <div class="col-6 col-lg-2">
+      <label class="form-label">Travel date to</label>
+      {{ form.date_to(class="form-control") }}
+    </div>
+
+    {% if current_user.role == 'admin' %}
+    <div class="col-12 col-lg-3">
+      <label class="form-label">Agent</label>
+      {{ form.agent_id(class="form-select") }}
+    </div>
+    {% endif %}
+
+    <div class="col-12 col-lg-2 d-flex gap-2">
+      <button class="btn btn-primary w-100" type="submit">Filter</button>
+      <a class="btn btn-outline-secondary w-100" href="/bookings">Reset</a>
+    </div>
+
+    <div class="col-12 col-lg-2">
+      <a class="btn btn-success w-100" href="/bookings/new">+ New Booking</a>
+    </div>
+  </form>
+</div>
+
+<div class="card card-soft p-3">
+  <div class="table-responsive">
+    <table class="table table-sm align-middle mb-0">
+      <thead>
+        <tr class="muted">
+          <th>Reference</th>
+          <th>Client</th>
+          <th>Destination</th>
+          <th>Status</th>
+          <th>Travel</th>
+          <th class="text-end">Total</th>
+          <th class="text-end">Due</th>
+          <th class="text-end"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in bookings %}
+          <tr>
+            <td class="fw-semibold">{{ b.reference }}</td>
+            <td>{{ b.client.first_name }} {{ b.client.last_name }}</td>
+            <td>{{ b.destination }}</td>
+            <td><span class="badge text-bg-light">{{ b.status }}</span></td>
+            <td class="muted">{{ b.travel_date or "-" }}</td>
+            <td class="text-end">{{ "%.2f"|format(b.total_price) }} {{ b.currency }}</td>
+            <td class="text-end">{{ "%.2f"|format(b.due_amount()) }} {{ b.currency }}</td>
+            <td class="text-end">
+              <a class="btn btn-sm btn-outline-primary" href="/bookings/{{ b.id }}">Open</a>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="8" class="muted">No bookings found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if pagination.pages > 1 %}
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <div class="muted small">
+      Page {{ pagination.page }} of {{ pagination.pages }} · Total {{ pagination.total }}
+    </div>
+
+    <div class="d-flex gap-2">
+      {% if prev_url %}
+        <a class="btn btn-sm btn-outline-secondary" href="{{ prev_url }}">Prev</a>
+      {% else %}
+        <button class="btn btn-sm btn-outline-secondary" disabled>Prev</button>
+      {% endif %}
+
+      {% if next_url %}
+        <a class="btn btn-sm btn-outline-secondary" href="{{ next_url }}">Next</a>
+      {% else %}
+        <button class="btn btn-sm btn-outline-secondary" disabled>Next</button>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

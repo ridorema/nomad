@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block page_title %}Clients{% endblock %}
+{% block page_subtitle %}List{% endblock %}
+
+{% block content %}
+
+<div class="card card-soft p-3 mb-3">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-12 col-lg-4">
+      <label class="form-label">Search (name / email / phone)</label>
+      <input type="text" name="q" value="{{ q or '' }}" class="form-control" placeholder="John / email / phone">
+    </div>
+    <div class="col-12 col-lg-2">
+      <button class="btn btn-primary w-100" type="submit">Search</button>
+    </div>
+  </form>
+</div>
+
+<div class="card card-soft p-3">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Created</th>
+          <th class="text-end">Open</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in clients %}
+          <tr>
+            <td>
+              <div class="fw-semibold">{{ c.first_name }} {{ c.last_name }}</div>
+            </td>
+            <td>{{ c.email }}</td>
+            <td>{{ c.phone }}</td>
+            <td>{{ c.created_at.strftime("%Y-%m-%d") if c.created_at else "-" }}</td>
+            <td class="text-end">
+              <a class="btn btn-sm btn-outline-primary" href="{{ url_for('clients.detail', client_id=c.id) }}">
+                Open
+              </a>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="5" class="text-center text-muted py-4">No clients found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

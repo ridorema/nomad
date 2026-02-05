@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block page_title %}Reports{% endblock %}
+{% block page_subtitle %}Agents{% endblock %}
+
+{% block content %}
+
+<div class="card card-soft p-3">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Agent</th>
+          <th>Email</th>
+          <th class="text-end">Open</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in agents %}
+        <tr>
+          <td class="fw-semibold">{{ a.full_name }}</td>
+          <td>{{ a.email }}</td>
+          <td class="text-end">
+            <a class="btn btn-sm btn-outline-primary" href="{{ url_for('reports.agent_report', agent_id=a.id) }}">
+              Open report
+            </a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" class="text-center text-muted py-4">No agents.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

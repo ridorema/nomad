@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block page_title %}Reports{% endblock %}
+{% block page_subtitle %}Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="card card-soft p-3 mb-3">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-12 col-lg-3">
+      <label class="form-label">Date from</label>
+      <input type="date" name="date_from" value="{{ date_from }}" class="form-control">
+    </div>
+    <div class="col-12 col-lg-3">
+      <label class="form-label">Date to</label>
+      <input type="date" name="date_to" value="{{ date_to }}" class="form-control">
+    </div>
+
+    {% if is_admin %}
+    <div class="col-12 col-lg-3">
+      <label class="form-label">Agent</label>
+      <select name="agent_id" class="form-select">
+        <option value="">All agents (total)</option>
+        {% for a in agents %}
+          <option value="{{ a.id }}" {{ 'selected' if selected_agent_id == (a.id|string) else '' }}>
+            {{ a.full_name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+
+    <div class="col-12 col-lg-3">
+      <button class="btn btn-primary w-100" type="submit">Apply</button>
+    </div>
+  </form>
+</div>
+
+<div class="row g-3">
+  <div class="col-12 col-lg-3">
+    <div class="card card-soft p-3">
+      <div class="text-muted small">Total Bookings</div>
+      <div class="fs-4 fw-semibold">{{ kpis.total_bookings }}</div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-3">
+    <div class="card card-soft p-3">
+      <div class="text-muted small">Revenue</div>
+      <div class="fs-4 fw-semibold">{{ "%.2f"|format(kpis.revenue) }}</div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-3">
+    <div class="card card-soft p-3">
+      <div class="text-muted small">Paid</div>
+      <div class="fs-4 fw-semibold">{{ "%.2f"|format(kpis.paid) }}</div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-3">
+    <div class="card card-soft p-3">
+      <div class="text-muted small">Due</div>
+      <div class="fs-4 fw-semibold">{{ "%.2f"|format(kpis.due) }}</div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-3">
+    <div class="card card-soft p-3">
+      <div class="text-muted small">Internal Cost</div>
+      <div class="fs-5 fw-semibold">{{ "%.2f"|format(kpis.internal_cost) }}</div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-3">
+    <div class="card card-soft p-3">
+      <div class="text-muted small">Profit</div>
+      <div class="fs-5 fw-semibold">{{ "%.2f"|format(kpis.profit) }}</div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-3">
+    <div class="card card-soft p-3">
+      <div class="text-muted small">Avg Booking</div>
+      <div class="fs-5 fw-semibold">{{ "%.2f"|format(kpis.avg_booking) }}</div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-3">
+    <div class="card card-soft p-3">
+      <div class="text-muted small">Margin %</div>
+      <div class="fs-5 fw-semibold">{{ "%.1f"|format(kpis.margin) }}%</div>
+    </div>
+  </div>
+</div>
+
+{% if is_admin %}
+  <div class="mt-4">
+    <a class="btn btn-outline-primary" href="{{ url_for('reports.agents_overview') }}">
+      View Agents Reports
+    </a>
+  </div>
+{% endif %}
+
+{% endblock %}

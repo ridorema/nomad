@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · Outgoing CRM{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}
+{% if current_user.role == 'admin' %}Overview of all activity{% else %}Your activity only{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="row g-3 mb-3">
+  <div class="col-12 col-md-6 col-lg-3">
+    <div class="card card-soft p-3">
+      <div class="muted">Total Bookings</div>
+      <div class="kpi">{{ kpi.total_bookings }}</div>
+      <div class="muted">Active: {{ kpi.active_bookings }}</div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-3">
+    <div class="card card-soft p-3">
+      <div class="muted">Total Clients</div>
+      <div class="kpi">{{ kpi.total_clients }}</div>
+      <div class="muted">Archived: {{ kpi.archived_clients }}</div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-3">
+    <div class="card card-soft p-3">
+      <div class="muted">Collected (Base EUR)</div>
+      <div class="kpi">{{ "%.2f"|format(kpi.collected_eur) }}</div>
+      <div class="muted">Payments: {{ kpi.total_payments }}</div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-3">
+    <div class="card card-soft p-3">
+      <div class="muted">Outstanding (Base EUR)</div>
+      <div class="kpi">{{ "%.2f"|format(kpi.outstanding_eur) }}</div>
+      <div class="muted">Pending payment: {{ kpi.pending_payment }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-12 col-lg-7">
+    <div class="card card-soft p-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="fw-semibold">Recent Bookings</div>
+        <div class="muted small">Latest 10</div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead>
+            <tr class="muted">
+              <th>Reference</th>
+              <th>Client</th>
+              <th>Destination</th>
+              <th>Status</th>
+              <th class="text-end">Total</th>
+              <th class="text-end">Due</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for b in recent_bookings %}
+            <tr>
+              <td class="fw-semibold">{{ b.reference }}</td>
+              <td>{{ b.client.first_name }} {{ b.client.last_name }}</td>
+              <td>{{ b.destination }}</td>
+              <td><span class="badge text-bg-light">{{ b.status }}</span></td>
+              <td class="text-end">{{ "%.2f"|format(b.total_price) }} {{ b.currency }}</td>
+              <td class="text-end">{{ "%.2f"|format(b.due_amount()) }} {{ b.currency }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="muted">No bookings yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-5">
+    <div class="card card-soft p-3 mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="fw-semibold">Top Destinations</div>
+        <div class="muted small">By bookings count</div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead>
+            <tr class="muted">
+              <th>Destination</th>
+              <th class="text-end">Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for dest, cnt in top_destinations %}
+              <tr>
+                <td>{{ dest }}</td>
+                <td class="text-end fw-semibold">{{ cnt }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="2" class="muted">No data.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card card-soft p-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="fw-semibold">Recent Activity</div>
+        <div class="muted small">Latest 8</div>
+      </div>
+
+      <ul class="list-group list-group-flush">
+        {% for log in recent_logs %}
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div>
+              <div class="fw-semibold">{{ log.action }}</div>
+              <div class="muted small">{{ log.entity_type }}{% if log.entity_id %} #{{ log.entity_id }}{% endif %}</div>
+            </div>
+            <div class="muted small">{{ log.created_at.strftime("%Y-%m-%d %H:%M") }}</div>
+          </li>
+        {% else %}
+          <li class="list-group-item muted">No activity yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

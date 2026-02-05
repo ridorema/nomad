@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block page_title %}Edit Client{% endblock %}
+{% block page_subtitle %}{{ client.first_name }} {{ client.last_name }}{% endblock %}
+
+{% block content %}
+
+<div class="card card-soft p-3">
+  <form method="post">
+    {{ form.hidden_tag() }}
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        {{ form.first_name.label(class="form-label") }}
+        {{ form.first_name(class="form-control") }}
+      </div>
+      <div class="col-md-6">
+        {{ form.last_name.label(class="form-label") }}
+        {{ form.last_name(class="form-control") }}
+      </div>
+
+      <div class="col-md-6">
+        {{ form.email.label(class="form-label") }}
+        {{ form.email(class="form-control") }}
+      </div>
+      <div class="col-md-6">
+        {{ form.phone.label(class="form-label") }}
+        {{ form.phone(class="form-control") }}
+      </div>
+
+      <div class="col-md-4">
+        {{ form.birth_date.label(class="form-label") }}
+        {{ form.birth_date(class="form-control") }}
+      </div>
+      <div class="col-md-4">
+        {{ form.passport_no.label(class="form-label") }}
+        {{ form.passport_no(class="form-control") }}
+      </div>
+      <div class="col-md-4">
+        {{ form.passport_expiry.label(class="form-label") }}
+        {{ form.passport_expiry(class="form-control") }}
+      </div>
+
+      <div class="col-md-6">
+        {{ form.nationality.label(class="form-label") }}
+        {{ form.nationality(class="form-control") }}
+      </div>
+      <div class="col-md-6">
+        {{ form.address.label(class="form-label") }}
+        {{ form.address(class="form-control") }}
+      </div>
+
+      <div class="col-12">
+        {{ form.notes.label(class="form-label") }}
+        {{ form.notes(class="form-control", rows="4") }}
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-3">
+      {{ form.submit(class="btn btn-primary") }}
+      <a class="btn btn-outline-secondary" href="{{ url_for('clients.detail', client_id=client.id) }}">Cancel</a>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

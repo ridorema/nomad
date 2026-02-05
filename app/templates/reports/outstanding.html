@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block page_title %}Reports{% endblock %}
+{% block page_subtitle %}Outstanding (Due){% endblock %}
+
+{% block content %}
+
+<div class="card card-soft p-3 mb-3">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-12 col-lg-2">
+      <label class="form-label">Date from</label>
+      <input type="date" name="date_from" value="{{ date_from }}" class="form-control">
+    </div>
+
+    <div class="col-12 col-lg-2">
+      <label class="form-label">Date to</label>
+      <input type="date" name="date_to" value="{{ date_to }}" class="form-control">
+    </div>
+
+    <div class="col-12 col-lg-2">
+      <label class="form-label">Destination</label>
+      <input type="text" name="destination" value="{{ destination }}" class="form-control" placeholder="Rome">
+    </div>
+
+    <div class="col-12 col-lg-2">
+      <label class="form-label">Status</label>
+      <select name="status" class="form-select">
+        {% for v, lbl in STATUS_CHOICES %}
+          <option value="{{ v }}" {{ 'selected' if status == v else '' }}>{{ lbl }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    {% if is_admin %}
+    <div class="col-12 col-lg-2">
+      <label class="form-label">Agent</label>
+      <select name="agent_id" class="form-select">
+        <option value="">All agents</option>
+        {% for a in agents %}
+          <option value="{{ a.id }}" {{ 'selected' if selected_agent_id == (a.id|string) else '' }}>
+            {{ a.full_name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+
+    <div class="col-12 col-lg-2">
+      <button class="btn btn-primary w-100" type="submit">Apply</button>
+    </div>
+  </form>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-12 col-lg-4">
+    <div class="card card-soft p-3">
+      <div class="text-muted small">Total Revenue (listed)</div>
+      <div class="fs-5 fw-semibold">{{ "%.2f"|format(total_revenue) }}</div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-4">
+    <div class="card card-soft p-3">
+      <div class="text-muted small">Total Paid (listed)</div>
+      <div class="fs-5 fw-semibold">{{ "%.2f"|format(total_paid) }}</div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-4">
+    <div class="card card-soft p-3">
+      <div class="text-muted small">Total Due</div>
+      <div class="fs-5 fw-semibold">{{ "%.2f"|format(total_due) }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="card card-soft p-3">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Client</th>
+          <th>Destination</th>
+          <th>Travel date</th>
+          <th>Status</th>
+          <th class="text-end">Revenue</th>
+          <th class="text-end">Paid</th>
+          <th class="text-end">Due</th>
+          <th class="text-end">Open</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+          {% set b = r.booking %}
+          <tr>
+            <td class="fw-semibold">{{ b.reference }}</td>
+            <td>
+              {% if b.client %}
+                <div class="fw-semibold">{{ b.client.first_name }} {{ b.client.last_name }}</div>
+                <div class="text-muted small">{{ b.client.email }} • {{ b.client.phone }}</div>
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td>{{ b.destination }}</td>
+            <td>{{ b.travel_date or "-" }}</td>
+            <td>{{ b.status }}</td>
+            <td class="text-end">{{ "%.2f"|format(r.revenue) }}</td>
+            <td class="text-end">{{ "%.2f"|format(r.paid) }}</td>
+            <td class="text-end fw-semibold">{{ "%.2f"|format(r.due) }}</td>
+            <td class="text-end">
+              <a class="btn btn-sm btn-outline-primary" href="{{ url_for('bookings.detail', booking_id=b.id) }}">
+                Open
+              </a>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="9" class="text-center text-muted py-4">No outstanding bookings.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

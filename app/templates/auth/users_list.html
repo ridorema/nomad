@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block page_title %}Users / Agents{% endblock %}
+{% block page_subtitle %}Manage system users{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h4>Users</h4>
+  <a href="{{ url_for('auth.users_create') }}" class="btn btn-primary btn-sm">
+    Add user
+  </a>
+</div>
+
+<div class="card card-soft p-3">
+  <table class="table table-sm align-middle">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.full_name }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.role }}</td>
+        <td>
+          {% if u.is_active %}
+            <span class="badge bg-success">Active</span>
+          {% else %}
+            <span class="badge bg-secondary">Disabled</span>
+          {% endif %}
+        </td>
+        <td class="text-end">
+          <a href="{{ url_for('auth.users_edit', user_id=u.id) }}"
+             class="btn btn-outline-secondary btn-sm">
+            Edit
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% block page_title %}New Booking{% endblock %}
+{% block page_subtitle %}Create a booking (client will be created automatically){% endblock %}
+
+{% macro field_error(field) -%}
+  {% if field.errors %}
+    <div class="text-danger small mt-1">{{ field.errors[0] }}</div>
+  {% endif %}
+{%- endmacro %}
+
+{% block content %}
+<form method="post" novalidate>
+  {{ form.hidden_tag() }}
+
+  <div class="row g-3">
+    <div class="col-12 col-lg-5">
+      <div class="card card-soft p-3">
+        <div class="fw-semibold mb-2">Client</div>
+
+        <div class="row g-2">
+          <div class="col-6">
+            <label class="form-label">First name</label>
+            {{ form.first_name(class="form-control") }}
+            {{ field_error(form.first_name) }}
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Last name</label>
+            {{ form.last_name(class="form-control") }}
+            {{ field_error(form.last_name) }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Email</label>
+            {{ form.email(class="form-control") }}
+            {{ field_error(form.email) }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Phone</label>
+            {{ form.phone(class="form-control") }}
+            {{ field_error(form.phone) }}
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Birth date</label>
+            {{ form.birth_date(class="form-control", type="date") }}
+            {{ field_error(form.birth_date) }}
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Nationality</label>
+            {{ form.nationality(class="form-control") }}
+            {{ field_error(form.nationality) }}
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Passport No</label>
+            {{ form.passport_no(class="form-control") }}
+            {{ field_error(form.passport_no) }}
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Passport Expiry</label>
+            {{ form.passport_expiry(class="form-control", type="date") }}
+            {{ field_error(form.passport_expiry) }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Address</label>
+            {{ form.address(class="form-control") }}
+            {{ field_error(form.address) }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Client notes</label>
+            {{ form.client_notes(class="form-control", rows="3") }}
+            {{ field_error(form.client_notes) }}
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-7">
+      <div class="card card-soft p-3">
+        <div class="fw-semibold mb-2">Booking</div>
+
+        <div class="row g-2">
+          <div class="col-6">
+            <label class="form-label">Type</label>
+            {{ form.booking_type(class="form-select") }}
+            {{ field_error(form.booking_type) }}
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Status</label>
+            {{ form.status(class="form-select") }}
+            {{ field_error(form.status) }}
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Departure city</label>
+            {{ form.departure_city(class="form-control") }}
+            {{ field_error(form.departure_city) }}
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Destination</label>
+            {{ form.destination(class="form-control") }}
+            {{ field_error(form.destination) }}
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Travel date</label>
+            {{ form.travel_date(class="form-control", type="date") }}
+            {{ field_error(form.travel_date) }}
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Return date</label>
+            {{ form.return_date(class="form-control", type="date") }}
+            {{ field_error(form.return_date) }}
+          </div>
+
+          <div class="col-4">
+            <label class="form-label">Pax</label>
+            {{ form.num_pax(class="form-control") }}
+            {{ field_error(form.num_pax) }}
+          </div>
+
+          <div class="col-4">
+            <label class="form-label">Adults</label>
+            {{ form.adults(class="form-control") }}
+            {{ field_error(form.adults) }}
+          </div>
+
+          <div class="col-4">
+            <label class="form-label">Children</label>
+            {{ form.children(class="form-control") }}
+            {{ field_error(form.children) }}
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Hotel</label>
+            {{ form.hotel_name(class="form-control") }}
+            {{ field_error(form.hotel_name) }}
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Flight numbers</label>
+            {{ form.flight_numbers(class="form-control") }}
+            {{ field_error(form.flight_numbers) }}
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">PNR</label>
+            {{ form.pnr(class="form-control") }}
+            {{ field_error(form.pnr) }}
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Currency</label>
+            {{ form.currency(class="form-select") }}
+            {{ field_error(form.currency) }}
+          </div>
+
+          <div class="col-4">
+            <label class="form-label">Total</label>
+            {{ form.total_price(class="form-control", step="0.01", inputmode="decimal") }}
+            {{ field_error(form.total_price) }}
+          </div>
+
+          <div class="col-4">
+            <label class="form-label">Discount</label>
+            {{ form.discount(class="form-control", step="0.01", inputmode="decimal") }}
+            {{ field_error(form.discount) }}
+          </div>
+
+          <div class="col-4">
+            <label class="form-label">Service fee</label>
+            {{ form.service_fee(class="form-control", step="0.01", inputmode="decimal") }}
+            {{ field_error(form.service_fee) }}
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Extras total</label>
+            {{ form.extras_total(class="form-control", step="0.01", inputmode="decimal") }}
+            {{ field_error(form.extras_total) }}
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Internal cost</label>
+            {{ form.internal_cost(class="form-control", step="0.01", inputmode="decimal") }}
+            {{ field_error(form.internal_cost) }}
+          </div>
+
+          <div class="col-12 d-flex justify-content-end mt-2">
+            <button class="btn btn-primary" type="submit">{{ form.submit.label.text }}</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}

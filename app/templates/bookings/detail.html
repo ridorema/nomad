@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block page_title %}Booking {{ booking.reference }}{% endblock %}
+{% block page_subtitle %}Client + payments + documents + checklist{% endblock %}
+
+{% block content %}
+
+<div class="row g-3">
+  <!-- LEFT: Booking + Client -->
+  <div class="col-12 col-lg-6">
+    <div class="card card-soft p-3 mb-3">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="fw-semibold" style="font-size:18px;">{{ booking.reference }}</div>
+          <div class="muted">Status: <span class="badge text-bg-light">{{ booking.status }}</span></div>
+        </div>
+        <div class="text-end">
+          <div class="muted">Total</div>
+          <div class="fw-bold">{{ "%.2f"|format(booking.total_price) }} {{ booking.currency }}</div>
+          <div class="muted mt-1">Paid: {{ "%.2f"|format(booking.paid_amount()) }} · Due: {{ "%.2f"|format(booking.due_amount()) }}</div>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="row g-2">
+        <div class="col-6"><div class="muted">Type</div><div class="fw-semibold">{{ booking.booking_type }}</div></div>
+        <div class="col-6"><div class="muted">Destination</div><div class="fw-semibold">{{ booking.destination }}</div></div>
+
+        <div class="col-6"><div class="muted">Travel date</div><div class="fw-semibold">{{ booking.travel_date or "-" }}</div></div>
+        <div class="col-6"><div class="muted">Return date</div><div class="fw-semibold">{{ booking.return_date or "-" }}</div></div>
+
+        <div class="col-6"><div class="muted">Departure</div><div class="fw-semibold">{{ booking.departure_city or "-" }}</div></div>
+        <div class="col-6"><div class="muted">PNR</div><div class="fw-semibold">{{ booking.pnr or "-" }}</div></div>
+
+        <div class="col-4"><div class="muted">Pax</div><div class="fw-semibold">{{ booking.num_pax }}</div></div>
+        <div class="col-4"><div class="muted">Adults</div><div class="fw-semibold">{{ booking.adults }}</div></div>
+        <div class="col-4"><div class="muted">Children</div><div class="fw-semibold">{{ booking.children }}</div></div>
+      </div>
+    </div>
+
+    <div class="card card-soft p-3">
+      <div class="fw-semibold mb-2">Client</div>
+      <a class="btn btn-sm btn-outline-secondary" href="/bookings/{{ booking.id }}/edit">Edit</a>
+
+      <div class="row g-2">
+        <div class="col-6"><div class="muted">Name</div><div class="fw-semibold">{{ client.first_name }} {{ client.last_name }}</div></div>
+        <div class="col-6"><div class="muted">Nationality</div><div class="fw-semibold">{{ client.nationality or "-" }}</div></div>
+        <div class="col-6"><div class="muted">Email</div><div class="fw-semibold">{{ client.email }}</div></div>
+        <div class="col-6"><div class="muted">Phone</div><div class="fw-semibold">{{ client.phone }}</div></div>
+        <div class="col-6"><div class="muted">Birth date</div><div class="fw-semibold">{{ client.birth_date or "-" }}</div></div>
+        <div class="col-6"><div class="muted">Passport</div><div class="fw-semibold">{{ client.passport_no or "-" }}</div></div>
+        <div class="col-12"><div class="muted">Address</div><div class="fw-semibold">{{ client.address or "-" }}</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Checklist + Payments + Docs -->
+  <div class="col-12 col-lg-6">
+
+    <div class="card card-soft p-3 mb-3">
+      <div class="fw-semibold mb-2">Checklist</div>
+      {% if missing_docs %}
+        <div class="alert alert-warning mb-0">
+          Missing required: <strong>{{ ", ".join(missing_docs) }}</strong>
+        </div>
+      {% else %}
+        <div class="alert alert-success mb-0">All required documents uploaded.</div>
+      {% endif %}
+    </div>
+
+    <div class="card card-soft p-3 mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="fw-semibold">Payments</div>
+        <div class="muted small">Partial payments supported</div>
+      </div>
+
+      <form method="post" action="/bookings/{{ booking.id }}/payments/add" class="row g-2">
+        {{ payment_form.hidden_tag() }}
+        <div class="col-4">{{ payment_form.amount(class="form-control", placeholder="Amount") }}</div>
+        <div class="col-3">{{ payment_form.currency(class="form-select") }}</div>
+        <div class="col-3">{{ payment_form.method(class="form-select") }}</div>
+        <div class="col-12">{{ payment_form.note(class="form-control", placeholder="Note (optional)") }}</div>
+        <div class="col-12 d-flex justify-content-end">
+          <button class="btn btn-primary" type="submit">Add Payment</button>
+        </div>
+      </form>
+
+      <hr>
+
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead>
+            <tr class="muted">
+              <th>Receipt</th>
+              <th>Method</th>
+              <th class="text-end">Amount</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in payments %}
+              <tr>
+                <td class="fw-semibold">{{ p.receipt_no or "-" }}</td>
+                <td>{{ p.method }}</td>
+                <td class="text-end">{{ "%.2f"|format(p.amount) }} {{ p.currency }}</td>
+                <td class="muted">{{ p.paid_at.strftime("%Y-%m-%d %H:%M") }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="4" class="muted">No payments yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card card-soft p-3 mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="fw-semibold">Documents</div>
+        <div class="muted small">Uploads saved in /uploads</div>
+      </div>
+
+      <form method="post" action="/bookings/{{ booking.id }}/docs/upload" enctype="multipart/form-data" class="row g-2">
+        {{ doc_form.hidden_tag() }}
+        <div class="col-6">{{ doc_form.doc_type(class="form-select") }}</div>
+        <div class="col-6 d-flex align-items-center gap-2">
+          {{ doc_form.is_required(class="form-check-input") }}
+          <label class="form-check-label">Required</label>
+        </div>
+        <div class="col-12">{{ doc_form.file(class="form-control") }}</div>
+        <div class="col-12 d-flex justify-content-end">
+          <button class="btn btn-outline-primary" type="submit">Upload</button>
+        </div>
+      </form>
+
+      <hr>
+
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead>
+            <tr class="muted">
+              <th>Type</th>
+              <th>File</th>
+              <th class="text-end">Required</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in docs %}
+              <tr>
+                <td class="fw-semibold">{{ d.doc_type }}</td>
+                <td class="muted">{{ d.original_name or d.file_path }}</td>
+                <td class="text-end">{% if d.is_required %}Yes{% else %}-{% endif %}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="3" class="muted">No documents yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card card-soft p-3">
+      <div class="fw-semibold mb-2">Recent Activity</div>
+      <ul class="list-group list-group-flush">
+        {% for log in recent_logs %}
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div>
+              <div class="fw-semibold">{{ log.action }}</div>
+              <div class="muted small">{{ log.entity_type }}{% if log.entity_id %} #{{ log.entity_id }}{% endif %}</div>
+            </div>
+            <div class="muted small">{{ log.created_at.strftime("%Y-%m-%d %H:%M") }}</div>
+          </li>
+        {% else %}
+          <li class="list-group-item muted">No activity.</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

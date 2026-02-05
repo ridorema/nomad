@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% block page_title %}Client{% endblock %}
+{% block page_subtitle %}{{ client.first_name }} {{ client.last_name }}{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <div class="fw-semibold fs-5">{{ client.first_name }} {{ client.last_name }}</div>
+    <div class="text-muted">{{ client.email }} • {{ client.phone }}</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary" href="{{ url_for('clients.list_clients') }}">Back</a>
+    <a class="btn btn-primary" href="{{ url_for('clients.edit', client_id=client.id) }}">Edit</a>
+  </div>
+</div>
+
+<ul class="nav nav-tabs" id="clientTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-info" type="button" role="tab">
+      Info
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-bookings" type="button" role="tab">
+      Bookings ({{ bookings|length }})
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-docs" type="button" role="tab">
+      Documents ({{ docs|length }})
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-payments" type="button" role="tab">
+      Payments ({{ payments|length }})
+    </button>
+  </li>
+
+</ul>
+
+<div class="tab-content border border-top-0 rounded-bottom p-3 bg-white">
+
+  <!-- INFO -->
+  <div class="tab-pane fade show active" id="tab-info" role="tabpanel">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="text-muted small">Birth date</div>
+        <div class="fw-semibold">{{ client.birth_date or "-" }}</div>
+      </div>
+      <div class="col-md-4">
+        <div class="text-muted small">Nationality</div>
+        <div class="fw-semibold">{{ client.nationality or "-" }}</div>
+      </div>
+      <div class="col-md-4">
+        <div class="text-muted small">Address</div>
+        <div class="fw-semibold">{{ client.address or "-" }}</div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="text-muted small">Passport no</div>
+        <div class="fw-semibold">{{ client.passport_no or "-" }}</div>
+      </div>
+      <div class="col-md-4">
+        <div class="text-muted small">Passport expiry</div>
+        <div class="fw-semibold">{{ client.passport_expiry or "-" }}</div>
+      </div>
+      <div class="col-md-12">
+        <div class="text-muted small">Notes</div>
+        <div class="fw-semibold" style="white-space:pre-wrap">{{ client.notes or "-" }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOOKINGS -->
+  <div class="tab-pane fade" id="tab-bookings" role="tabpanel">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Reference</th>
+            <th>Destination</th>
+            <th>Travel date</th>
+            <th>Status</th>
+            <th class="text-end">Open</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in bookings %}
+          <tr>
+            <td class="fw-semibold">{{ b.reference }}</td>
+            <td>{{ b.destination }}</td>
+            <td>{{ b.travel_date or "-" }}</td>
+            <td>{{ b.status }}</td>
+            <td class="text-end">
+              <a class="btn btn-sm btn-outline-primary" href="{{ url_for('bookings.detail', booking_id=b.id) }}">Open</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="text-center text-muted py-4">No bookings.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DOCS -->
+  <div class="tab-pane fade" id="tab-docs" role="tabpanel">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Original</th>
+            <th>Booking</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for d in docs %}
+          <tr>
+            <td class="fw-semibold">{{ d.doc_type }}</td>
+            <td>{{ d.original_name or d.file_path }}</td>
+            <td>{{ d.booking_id }}</td>
+            <td>{{ d.created_at.strftime("%Y-%m-%d %H:%M") if d.created_at else "-" }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="text-center text-muted py-4">No documents.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="text-muted small mt-2">
+      Upload documents currently happens from the Booking detail page.
+    </div>
+  </div>
+
+  <!-- PAYMENTS -->
+  <div class="tab-pane fade" id="tab-payments" role="tabpanel">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Amount</th>
+            <th>Currency</th>
+            <th>Method</th>
+            <th>Receipt</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in payments %}
+          <tr>
+            <td class="fw-semibold">{{ "%.2f"|format(p.amount) }}</td>
+            <td>{{ p.currency }}</td>
+            <td>{{ p.method }}</td>
+            <td>{{ p.receipt_no or "-" }}</td>
+            <td>{{ p.paid_at.strftime("%Y-%m-%d %H:%M") if p.paid_at else "-" }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="text-center text-muted py-4">No payments.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ACTIVITY -->
+  <div class="tab-pane fade" id="tab-activity" role="tabpanel">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>When</th>
+            <th>Action</th>
+            <th>Entity</th>
+            <th>ID</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for l in recent_logs %}
+          <tr>
+            <td>{{ l.created_at.strftime("%Y-%m-%d %H:%M") if l.created_at else "-" }}</td>
+            <td class="fw-semibold">{{ l.action }}</td>
+            <td>{{ l.entity_type }}</td>
+            <td>{{ l.entity_id or "-" }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="text-center text-muted py-4">No activity.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
